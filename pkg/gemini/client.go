@@ -1,34 +1,34 @@
-package main
+package gemini
 
 import (
 	"context"
 	"os"
+	"strings"
 
 	"google.golang.org/genai"
 )
 
-type GeminiClient struct {
+type Client struct {
 	client *genai.Client
 	model  string
 }
 
-func NewGeminiClient(ctx context.Context, apiKey string) (*GeminiClient, error) {
+func NewClient(ctx context.Context, apiKey string) (*Client, error) {
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  apiKey,
 		Backend: genai.BackendGeminiAPI,
 	})
-
 	if err != nil {
 		return nil, err
 	}
 
-	return &GeminiClient{
+	return &Client{
 		client: client,
 		model:  "gemini-2.0-flash-lite",
 	}, nil
 }
 
-func (c *GeminiClient) NewContentsFromAudio(ctx context.Context, audioPath string) ([]*genai.Content, error) {
+func (c *Client) NewContentsFromAudio(audioPath string, prev ...string) ([]*genai.Content, error) {
 	audioBytes, err := os.ReadFile(audioPath)
 	if err != nil {
 		return nil, err
@@ -41,16 +41,24 @@ func (c *GeminiClient) NewContentsFromAudio(ctx context.Context, audioPath strin
 		},
 	}
 
-	parts := []*genai.Part{
+	var parts []*genai.Part
+
+	if len(prev) > 0 {
+		ctxText := strings.Join(prev, "\n\n---\n\n")
+		parts = append(parts, genai.NewPartFromText("Previous transcript context:\n\n"+ctxText))
+	}
+
+	parts = append(parts,
 		genai.NewPartFromText("Generate a transcript of the speech."),
 		audioPart,
-	}
+	)
+
 	return []*genai.Content{
 		genai.NewContentFromParts(parts, genai.RoleUser),
 	}, nil
 }
 
-func (c *GeminiClient) Transcribe(ctx context.Context, contents []*genai.Content) (string, error) {
+func (c *Client) Transcribe(ctx context.Context, contents []*genai.Content) (string, error) {
 	temperature := float32(0.2)
 	content, err := c.client.Models.GenerateContent(ctx, c.model, contents, &genai.GenerateContentConfig{
 		Temperature: &temperature,

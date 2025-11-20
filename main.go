@@ -2,38 +2,29 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
-	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/tuanta7/transcript/pkg/gemini"
+	"github.com/tuanta7/transcript/pkg/ui"
 )
 
 func main() {
 	ctx := context.Background()
 
-	gc, err := NewGeminiClient(ctx, os.Getenv("GEMINI_API_KEY"))
+	gc, err := gemini.NewClient(ctx, os.Getenv("GEMINI_API_KEY"))
 	if err != nil {
-		log.Fatalf("failed to create Gemini client: %v\n", err)
+		fmt.Printf("Failed to create Gemini client: %v", err)
+		os.Exit(1)
 	}
 
-	r := NewRecorder()
-	err = r.Record(10*time.Second, "output.wav")
-	if err != nil {
-		log.Fatalf("failed to record audio: %v\n", err)
-	}
+	model := ui.NewModel(gc)
 
-	contents, err := gc.NewContentsFromAudio(ctx, "output.wav")
+	_, err = tea.NewProgram(model).Run()
 	if err != nil {
-		log.Fatalf("failed to create contents from audio: %v\n", err)
-	}
-
-	text, err := gc.Transcribe(ctx, contents)
-	if err != nil {
-		log.Fatalf("failed to transcribe audio: %v\n", err)
-	}
-
-	if text != "" {
-		log.Println(text)
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
 }

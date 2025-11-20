@@ -1,4 +1,4 @@
-package main
+package audio
 
 import (
 	"bytes"
@@ -27,6 +27,7 @@ func (r *Recorder) Record(duration time.Duration, outputFile string) error {
 	cmd := exec.Command("ffmpeg", "-f", "pulse",
 		"-i", monitorSource,
 		"-t", fmt.Sprintf("%0.2f", duration.Seconds()),
+		"-y", // overwrite output file
 		outputFile,
 	)
 	if err = cmd.Run(); err != nil {
@@ -41,11 +42,11 @@ func (r *Recorder) getMonitorSource() (string, error) {
 	defer pr.Close()
 
 	listCmd := exec.Command("pactl", "list", "sinks")
-	listCmd.Stdout = pw // writes into the pipe’s write-end
+	listCmd.Stdout = pw // writes into the pipe's write-end
 
 	var buf bytes.Buffer
 	grepCmd := exec.Command("grep", ".monitor")
-	grepCmd.Stdin = pr // receives data from the pipe’s read-end
+	grepCmd.Stdin = pr // receives data from the pipe's read-end
 	grepCmd.Stdout = &buf
 
 	if err := grepCmd.Start(); err != nil {
@@ -58,7 +59,6 @@ func (r *Recorder) getMonitorSource() (string, error) {
 		_ = grepCmd.Wait()
 		return "", err
 	}
-
 	// close writer to signal EOF to grep
 	_ = pw.Close()
 
