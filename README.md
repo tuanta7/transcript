@@ -1,24 +1,45 @@
 # Transcript
 
-A simple desktop audio transcription application.
+A real-time desktop audio transcription application with a clean TUI interface. Transcribe your microphone audio on the fly using Google's Gemini API.
 
-## Quick start
+![Demo](demo.gif)
 
-```shell
+Dart scene in Ted Lasso (2x speed)
 
+## Quick Start
+
+### Prerequisites
+
+```bash
+# Install required dependencies
+./install.sh
 ```
 
-Example output:
+This will install:
+- `pulseaudio-utils` - For audio capture
+- `ffmpeg` - For audio processing
 
-```shell
-2025/11/20 10:11:49 People have told me I don't look the same. Maybe I lost weight.
-```
+## Configuration
 
-## References
+Environment variables
 
-- Gemini API Key: https://aistudio.google.com/app/api-keys
+| Variable | Description | Values |
+|----------|-------------|--------|
+| `TRANSCRIPTOR_MODE` | Transcription backend | `gemini`, `local` |
+| `GEMINI_API_KEY` | Google Gemini API key | Your API key |
+
+### Get a Gemini API Key
+
+1. Visit [Google AI Studio](https://aistudio.google.com/app/api-keys)
+2. Create a new API key
+3. Add it to your `.env` file
+
 
 ## TODO
 
-- Add options to use local Gemma 3n model
-- Implement UI (TUI) for managing recordings
+- [ ] Add support for local Gemma 3n model
+- [ ] Support for multiple audio sources
+- [ ] Export to text/markdown format
+- [ ] Real-time word highlighting
+- [ ] Custom recording duration settings
+

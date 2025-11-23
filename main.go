@@ -16,7 +16,8 @@ import (
 func main() {
 	ctx := context.Background()
 
-	gc, err := transcriptor.NewClient(ctx, transcriptor.GoogleMode, os.Getenv("GEMINI_API_KEY"))
+	tm := transcriptor.Mode(os.Getenv("TRANSCRIPTOR_MODE"))
+	gc, err := transcriptor.NewClient(ctx, tm, os.Getenv("GEMINI_API_KEY"))
 	if err != nil {
 		fmt.Printf("Failed to create Gemini client: %v", err)
 		os.Exit(1)
