@@ -36,7 +36,7 @@ func (a *Application) transcribe(stream chan string) error {
 			fullText += chunk
 
 			select {
-			case stream <- chunk:
+			case stream <- chunk + "\n":
 			case <-a.ctx.Done():
 				_ = reader.Close()
 				return a.ctx.Err()

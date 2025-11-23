@@ -35,9 +35,14 @@ func NewModel(app *core.Application) *Model {
 
 	ta := textarea.New()
 	ta.Placeholder = "Transcription will appear here..."
-	ta.ShowLineNumbers = false
+	ta.ShowLineNumbers = true
 	ta.SetWidth(90)
 	ta.SetHeight(10)
+	ta.KeyMap.DeleteCharacterBackward.SetEnabled(false)
+	ta.KeyMap.DeleteCharacterForward.SetEnabled(false)
+	ta.KeyMap.DeleteWordBackward.SetEnabled(false)
+	ta.KeyMap.DeleteWordForward.SetEnabled(false)
+	ta.KeyMap.InsertNewline.SetEnabled(false)
 
 	return &Model{
 		screen:      screenMenu,
@@ -99,6 +104,11 @@ func (m *Model) handleKeyEvent(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		case "s", "S":
 			filename, err := m.app.StopSession()
 			return m, m.sessionEnd(filename, err)
+		default:
+			// Pass other keys to textarea for scrolling
+			var cmd tea.Cmd
+			m.transcript, cmd = m.transcript.Update(msg)
+			return m, cmd
 		}
 	}
 
@@ -115,6 +125,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	case transcriptChunkMsg:
 		m.transcript.SetValue(m.transcript.Value() + mt.Text)
+		m.transcript.CursorEnd()
 		return m, m.waitForTranscript()
 	case sessionEndMsg:
 		m.screen = screenMenu
@@ -151,7 +162,7 @@ func (m *Model) View() string {
 		b.WriteString(statusStyle.Render(m.spinner.View() + " Recording..."))
 		b.WriteString("\n")
 		b.WriteString(transcriptBoxStyle.Render(m.transcript.View()))
-		b.WriteString(helpStyle.Render("s: stop and save • q: quit"))
+		b.WriteString(helpStyle.Render("↑/↓: scroll • s: stop and save • q: quit"))
 	}
 
 	return b.String()
