@@ -4,7 +4,7 @@ A real-time desktop audio transcription application with a clean TUI interface. 
 
 ![Demo](demo.gif)
 
-Dart scene in Ted Lasso (2x speed)
+> Darts scene in Ted Lasso (2x speed)
 
 ## Quick Start
 
@@ -16,6 +16,7 @@ Dart scene in Ted Lasso (2x speed)
 ```
 
 This will install:
+
 - `pulseaudio-utils` - For audio capture
 - `ffmpeg` - For audio processing
 
@@ -23,17 +24,16 @@ This will install:
 
 Environment variables
 
-| Variable | Description | Values |
-|----------|-------------|--------|
-| `TRANSCRIPTOR_MODE` | Transcription backend | `gemini`, `local` |
-| `GEMINI_API_KEY` | Google Gemini API key | Your API key |
+| Variable            | Description           | Values            |
+| ------------------- | --------------------- | ----------------- |
+| `TRANSCRIPTOR_MODE` | Transcription backend | `google`, `local` |
+| `GEMINI_API_KEY`    | Google Gemini API key | Your API key      |
 
 ### Get a Gemini API Key
 
-1. Visit [Google AI Studio](https://aistudio.google.com/app/api-keys)
-2. Create a new API key
-3. Add it to your `.env` file
-
+- Visit [Google AI Studio](https://aistudio.google.com/app/api-keys)
+- Create a new API key
+- Add it to your `.env` file
 
 ## TODO
 
@@ -42,4 +42,3 @@ Environment variables
 - [ ] Export to text/markdown format
 - [ ] Real-time word highlighting
 - [ ] Custom recording duration settings
-
