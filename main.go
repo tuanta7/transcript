@@ -7,21 +7,25 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/tuanta7/transcript/pkg/gemini"
-	"github.com/tuanta7/transcript/pkg/ui"
+	"github.com/tuanta7/transcript/internal/core"
+	"github.com/tuanta7/transcript/internal/ui"
+	"github.com/tuanta7/transcript/pkg/audio"
+	"github.com/tuanta7/transcript/pkg/transcriptor"
 )
 
 func main() {
 	ctx := context.Background()
 
-	gc, err := gemini.NewClient(ctx, os.Getenv("GEMINI_API_KEY"))
+	gc, err := transcriptor.NewClient(ctx, transcriptor.GoogleMode, os.Getenv("GEMINI_API_KEY"))
 	if err != nil {
 		fmt.Printf("Failed to create Gemini client: %v", err)
 		os.Exit(1)
 	}
 
-	model := ui.NewModel(gc)
+	recorder := audio.NewRecorder()
+	app := core.NewApplication(recorder, gc)
 
+	model := ui.NewModel(app)
 	_, err = tea.NewProgram(model).Run()
 	if err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
