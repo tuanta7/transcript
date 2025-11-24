@@ -35,7 +35,6 @@ func NewModel(app *core.Application) *Model {
 	sp.Spinner = spinner.Dot
 
 	vp := viewport.New(90, 5)
-	vp.VisibleLineCount()
 	vp.SetContent("")
 
 	return &Model{
@@ -119,7 +118,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spinner, cmd = m.spinner.Update(mt)
 		return m, cmd
 	case transcriptChunkMsg:
-		m.transcriptContent += mt.Text
+		m.transcriptContent += mt.Text + "\n"
 		m.transcript.SetContent(m.transcriptContent)
 		m.transcript.GotoBottom()
 
@@ -158,7 +157,8 @@ func (m *Model) View() string {
 		b.WriteString("\n")
 		b.WriteString(statusStyle.Render(m.spinner.View() + " Recording..."))
 		b.WriteString("\n")
-		b.WriteString(transcriptBoxStyle.Render(m.transcript.View()))
+		b.WriteString(transcriptBoxStyle.Render(transcriptTextStyle.Render(m.transcript.View())))
+		b.WriteString("\n")
 		b.WriteString(helpStyle.Render("↑/↓: scroll • s: stop and save • q: quit"))
 	}
 

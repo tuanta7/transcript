@@ -34,5 +34,8 @@ var (
 	transcriptBoxStyle = lipgloss.NewStyle().
 				Foreground(textPrimary).
 				BorderForeground(accentBlue).
-				Padding(1)
+				Border(lipgloss.RoundedBorder(), true)
+
+	transcriptTextStyle = lipgloss.NewStyle().
+				Foreground(textPrimary)
 )
