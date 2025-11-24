@@ -1,10 +1,10 @@
 # Transcript
 
-A real-time desktop audio transcription application with a clean TUI interface. Transcribe your microphone audio on the fly using Google's Gemini API.
+A real-time desktop audio transcription application with a clean TUI interface. Transcribe your system audio on the fly using Google's Gemini API.
 
 ![Demo](demo.gif)
 
-> Darts scene in Ted Lasso (2x speed)
+> Darts scene from Ted Lasso (2x speed)
 
 ## Quick Start
 
@@ -35,10 +35,10 @@ Environment variables
 - Create a new API key
 - Add it to your `.env` file
 
-## TODO
+## Todo List
 
-- [ ] Add support for local Gemma 3n model
-- [ ] Support for multiple audio sources
+- [ ] Add support for local model (whisper, gemma3n + ollama, etc.)
+- [ ] Support for multiple audio sources (microphones, system)
 - [ ] Export to text/markdown format
 - [ ] Real-time word highlighting
 - [ ] Custom recording duration settings
