@@ -8,12 +8,12 @@ import (
 	"google.golang.org/genai"
 )
 
-type GoogleClient struct {
+type GeminiClient struct {
 	client *genai.Client
 	model  string
 }
 
-func NewGoogleClient(ctx context.Context, apiKey string) (*GoogleClient, error) {
+func NewGeminiClient(ctx context.Context, apiKey string) (*GeminiClient, error) {
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  apiKey,
 		Backend: genai.BackendGeminiAPI,
@@ -22,13 +22,13 @@ func NewGoogleClient(ctx context.Context, apiKey string) (*GoogleClient, error) 
 		return nil, err
 	}
 
-	return &GoogleClient{
+	return &GeminiClient{
 		client: client,
 		model:  "gemini-2.0-flash",
 	}, nil
 }
 
-func (c *GoogleClient) Transcribe(ctx context.Context, audioPath string) (io.ReadCloser, error) {
+func (c *GeminiClient) Transcribe(ctx context.Context, audioPath string) (io.ReadCloser, error) {
 	contents, err := c.newContentsFromAudio(audioPath)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (c *GoogleClient) Transcribe(ctx context.Context, audioPath string) (io.Rea
 	return r, nil
 }
 
-func (c *GoogleClient) newContentsFromAudio(audioPath string) ([]*genai.Content, error) {
+func (c *GeminiClient) newContentsFromAudio(audioPath string) ([]*genai.Content, error) {
 	audioBytes, err := os.ReadFile(audioPath)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (c *GoogleClient) newContentsFromAudio(audioPath string) ([]*genai.Content,
 	return []*genai.Content{genai.NewContentFromParts(parts, genai.RoleUser)}, nil
 }
 
-func (c *GoogleClient) writeToStream(ctx context.Context, w *io.PipeWriter, chunk *genai.GenerateContentResponse) {
+func (c *GeminiClient) writeToStream(ctx context.Context, w *io.PipeWriter, chunk *genai.GenerateContentResponse) {
 	select {
 	case <-ctx.Done():
 		return

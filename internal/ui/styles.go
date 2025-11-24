@@ -3,11 +3,11 @@ package ui
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	accentBlue   = lipgloss.Color("#00D9FF")
-	accentPurple = lipgloss.Color("#B57EDC")
-	accentGreen  = lipgloss.Color("#50FA7B")
-	textPrimary  = lipgloss.Color("#F8F8F2")
-	textMuted    = lipgloss.Color("#6272A4")
+	accentBlue   = lipgloss.Color("#A7E9FF") // pastel cyan
+	accentPurple = lipgloss.Color("#D8B7FF") // lavender
+	accentGreen  = lipgloss.Color("#BFFFC5") // mint
+	textPrimary  = lipgloss.Color("#F7F7FF") // very light off-white
+	textMuted    = lipgloss.Color("#9AA2B2") // muted gray-blue
 
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).

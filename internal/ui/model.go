@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
-	"github.com/charmbracelet/bubbles/textarea"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/tuanta7/transcript/internal/core"
 )
@@ -22,8 +22,9 @@ type Model struct {
 	cursor      int
 	menuOptions []string
 
-	spinner    spinner.Model
-	transcript textarea.Model
+	spinner           spinner.Model
+	transcript        viewport.Model
+	transcriptContent string
 
 	app    *core.Application
 	stream <-chan string
@@ -33,22 +34,15 @@ func NewModel(app *core.Application) *Model {
 	sp := spinner.New()
 	sp.Spinner = spinner.Dot
 
-	ta := textarea.New()
-	ta.Placeholder = "Transcription will appear here..."
-	ta.ShowLineNumbers = true
-	ta.SetWidth(90)
-	ta.SetHeight(10)
-	ta.KeyMap.DeleteCharacterBackward.SetEnabled(false)
-	ta.KeyMap.DeleteCharacterForward.SetEnabled(false)
-	ta.KeyMap.DeleteWordBackward.SetEnabled(false)
-	ta.KeyMap.DeleteWordForward.SetEnabled(false)
-	ta.KeyMap.InsertNewline.SetEnabled(false)
+	vp := viewport.New(90, 5)
+	vp.VisibleLineCount()
+	vp.SetContent("")
 
 	return &Model{
 		screen:      screenMenu,
 		menuOptions: []string{"Start Session", "Exit"},
 		spinner:     sp,
-		transcript:  ta,
+		transcript:  vp,
 		app:         app,
 	}
 }
@@ -61,7 +55,9 @@ func (m *Model) handleMenuSelection() (tea.Model, tea.Cmd) {
 	switch m.cursor {
 	case 0:
 		m.screen = screenRecording
-		m.transcript.Reset()
+		m.transcriptContent = ""
+		m.transcript.SetContent("")
+		m.transcript.YOffset = 0
 
 		var err error
 		m.stream, err = m.app.StartSession()
@@ -105,7 +101,6 @@ func (m *Model) handleKeyEvent(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			filename, err := m.app.StopSession()
 			return m, m.sessionEnd(filename, err)
 		default:
-			// Pass other keys to textarea for scrolling
 			var cmd tea.Cmd
 			m.transcript, cmd = m.transcript.Update(msg)
 			return m, cmd
@@ -124,8 +119,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spinner, cmd = m.spinner.Update(mt)
 		return m, cmd
 	case transcriptChunkMsg:
-		m.transcript.SetValue(m.transcript.Value() + mt.Text)
-		m.transcript.CursorEnd()
+		m.transcriptContent += mt.Text
+		m.transcript.SetContent(m.transcriptContent)
+		m.transcript.GotoBottom()
+
 		return m, m.waitForTranscript()
 	case sessionEndMsg:
 		m.screen = screenMenu
