@@ -25,4 +25,7 @@ sudo apt install cmake
 # Build the libwhisper.a library
 cd whisper/bindings/go
 make whisper
+
+# Or
+GGML_CUDA=1 make whisper
 ```

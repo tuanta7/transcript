@@ -1,7 +1,5 @@
 #!/bin/bash
 
-WHISPER_MODEL="ggml-small.bin"
-
 # Get the absolute path of the script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -14,13 +12,9 @@ NC='\033[0m' # No Color
 # Set up paths relative to project root
 WHISPER_CPP_DIR="$PROJECT_DIR/whisper"
 WHISPER_BUILD_DIR="$PROJECT_DIR/whisper/build_go"
-MODELS_DIR="$PROJECT_DIR/models"
 
 echo -e "${GREEN}[INFO]${NC} Setting up environment..."
 echo "Project root: $PROJECT_DIR"
-
-# Model paths
-export WHISPER_MODEL_PATH="$MODELS_DIR/$WHISPER_MODEL"
 
 # Export environment variables
 export C_INCLUDE_PATH="$WHISPER_CPP_DIR/include:$WHISPER_CPP_DIR/ggml/include"

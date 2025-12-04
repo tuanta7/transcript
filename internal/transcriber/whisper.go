@@ -16,7 +16,7 @@ type WhisperClient struct {
 }
 
 func NewLocalClient() (*WhisperClient, error) {
-	model, err := whisper.New("models/ggml-base.bin")
+	model, err := whisper.New("models/ggml-medium.bin")
 	if err != nil {
 		return nil, err
 	}

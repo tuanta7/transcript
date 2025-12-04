@@ -39,8 +39,8 @@ Environment variables
 
 ## Todo List
 
-- [x] Add support for local models (whisper, gemma3n + ollama, etc.)
-- [ ] Support for multiple audio sources (microphones, system)
-- [ ] Export to text/Markdown format
-- [ ] Real-time word highlighting
+- [x] Add support for local whisper models
 - [x] Custom recording chunk duration settings
+- [ ] Concurrent audio transcription
+- [ ] Real-time word highlighting
+
