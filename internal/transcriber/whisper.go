@@ -45,6 +45,9 @@ func (l *WhisperClient) ResetContext(_ context.Context) error {
 		return err
 	}
 
+	modelContext.SetTemperature(0.5)
+	modelContext.SetInitialPrompt(InitialPrompts)
+
 	l.ctx = modelContext
 	return nil
 }

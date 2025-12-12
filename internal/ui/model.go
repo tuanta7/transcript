@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/muesli/reflow/wordwrap"
-	"github.com/tuanta7/transcript/internal/core"
+	"github.com/tuanta7/ekko/internal/core"
 )
 
 type screen int
@@ -20,11 +20,12 @@ const (
 )
 
 type Model struct {
-	screen        screen
-	cursor        int
-	menuOptions   []string
-	chunkDuration time.Duration
-	errorMsg      string
+	screen          screen
+	cursor          int
+	menuOptions     []string
+	chunkDuration   time.Duration
+	errorMsg        string
+	sessionStopping bool
 
 	spinner           spinner.Model
 	transcript        viewport.Model
@@ -116,6 +117,10 @@ func (m *Model) handleKeyEvent(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			_, _ = m.app.Stop()
 			return m, tea.Quit
 		case "s", "S":
+			if m.sessionStopping {
+				return m, nil // ignore spam
+			}
+			m.sessionStopping = true
 			return m, m.sessionEnd()
 		default:
 			var cmd tea.Cmd
@@ -143,6 +148,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.waitForTranscript()
 	case sessionEndMsg:
 		m.screen = screenMenu
+		m.sessionStopping = false // reset guard
 		if mt.Error != nil {
 			m.errorMsg = fmt.Sprintf("Error: %v", mt.Error)
 		}

@@ -99,7 +99,7 @@ func (c *GeminiClient) newContentsFromAudio(audioPath string) ([]*genai.Content,
 	}
 
 	parts := []*genai.Part{
-		genai.NewPartFromText("Transcribe the speech. Output only the raw transcript text. Do not include timestamps, formatting, punctuation corrections, explanations, or answers to questions—just the plain spoken words exactly as heard."),
+		genai.NewPartFromText(InitialPrompts),
 		audioPart,
 	}
 

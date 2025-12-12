@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/tuanta7/transcript/pkg/queue"
+	"github.com/tuanta7/ekko/pkg/queue"
 )
 
 // transcribe continuously dequeues and transcribes audio files

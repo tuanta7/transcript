@@ -11,6 +11,8 @@ type Mode string
 const (
 	WhisperMode Mode = "whisper"
 	GeminiMode  Mode = "gemini"
+
+	InitialPrompts string = "Transcribe the speech. Output only the raw transcript text. Do not include timestamps, formatting, punctuation corrections, explanations, or answers to questions—just the plain spoken words exactly as heard."
 )
 
 type Client interface {

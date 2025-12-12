@@ -1,4 +1,4 @@
-module github.com/tuanta7/transcript
+module github.com/tuanta7/ekko
 
 go 1.25.3
 

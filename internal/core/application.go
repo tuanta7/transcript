@@ -9,10 +9,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tuanta7/transcript/internal/audio"
-	"github.com/tuanta7/transcript/internal/transcriber"
-	"github.com/tuanta7/transcript/pkg/queue"
-	"github.com/tuanta7/transcript/pkg/x"
+	"github.com/tuanta7/ekko/internal/audio"
+	"github.com/tuanta7/ekko/internal/transcriber"
+	"github.com/tuanta7/ekko/pkg/queue"
+	"github.com/tuanta7/ekko/pkg/x"
 )
 
 type TranscriptionChunk struct {

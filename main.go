@@ -7,10 +7,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/tuanta7/transcript/internal/audio"
-	"github.com/tuanta7/transcript/internal/core"
-	"github.com/tuanta7/transcript/internal/transcriber"
-	"github.com/tuanta7/transcript/internal/ui"
+	"github.com/tuanta7/ekko/internal/audio"
+	"github.com/tuanta7/ekko/internal/core"
+	"github.com/tuanta7/ekko/internal/transcriber"
+	"github.com/tuanta7/ekko/internal/ui"
 )
 
 func main() {
