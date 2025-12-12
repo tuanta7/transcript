@@ -24,7 +24,7 @@ type TranscriptionChunk struct {
 type Application struct {
 	wg            sync.WaitGroup
 	mu            sync.Mutex
-	isRunning     atomic.Bool
+	isRunning     bool
 	transcription *sync.Map
 
 	ctx    context.Context
@@ -44,23 +44,23 @@ func NewApplication(recorder *audio.Recorder, client transcriber.Client) *Applic
 }
 
 func (a *Application) Start(chunkDuration time.Duration) (<-chan string, error) {
-	// use mutex so initialization of ctx/cancel/queue/etc is serialized
 	a.mu.Lock()
-	defer a.mu.Unlock()
-
-	if a.isRunning.Load() {
+	if a.isRunning {
 		return nil, errors.New("session already running")
+	}
+
+	if err := os.Mkdir(".tmp", 0755); err != nil {
+		return nil, err
 	}
 
 	if err := a.initSession(); err != nil {
 		return nil, err
 	}
 
-	a.isRunning.Store(true)
+	a.isRunning = true
+	a.mu.Unlock()
 
 	stream := make(chan string, 100)
-	_ = os.Mkdir(".tmp", 0755)
-
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(2)
 
@@ -95,7 +95,7 @@ func (a *Application) Start(chunkDuration time.Duration) (<-chan string, error) 
 	go func() {
 		// when both workers finish, mark the session as not running
 		a.wg.Wait()
-		a.isRunning.Store(false)
+		a.isRunning = false
 	}()
 
 	return stream, nil
@@ -120,9 +120,8 @@ func (a *Application) initSession() error {
 }
 
 func (a *Application) Stop() (string, error) {
-	// lock to safely read/act on ctx/cancel and serialization with Start
 	a.mu.Lock()
-	if !a.isRunning.Load() {
+	if !a.isRunning {
 		a.mu.Unlock()
 		return "", errors.New("no active session")
 	}

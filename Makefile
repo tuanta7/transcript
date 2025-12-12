@@ -2,11 +2,12 @@
 SHELL := /bin/bash
 .ONESHELL:
 
-whisper:
-	source ./scripts/setup-whisper.sh
-
-deps:
+install:
 	./scripts/install.sh
+
+dev:
+	source ./scripts/setup-whisper.sh
+	go run .
 
 env:
 	awk -F'=' 'BEGIN {OFS="="} \

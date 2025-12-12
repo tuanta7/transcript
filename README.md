@@ -1,4 +1,4 @@
-# Transcript
+# Ekko
 
 A real-time desktop audio transcription application with a clean TUI interface. Transcribe your system audio on the fly using Google's Gemini API.
 
@@ -7,6 +7,10 @@ A real-time desktop audio transcription application with a clean TUI interface. 
 > Darts scene from Ted Lasso (2x speed)
 
 ## Quick Start
+
+```sh
+make dev
+```
 
 ### Prerequisites
 

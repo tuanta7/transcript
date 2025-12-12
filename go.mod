@@ -9,6 +9,7 @@ require (
 	github.com/ggerganov/whisper.cpp/bindings/go v0.0.0-20251120123511-19ceec8eac98
 	github.com/go-audio/wav v1.1.0
 	github.com/joho/godotenv v1.5.1
+	github.com/muesli/reflow v0.3.0
 	google.golang.org/genai v1.36.0
 )
 
@@ -35,7 +36,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
-	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
