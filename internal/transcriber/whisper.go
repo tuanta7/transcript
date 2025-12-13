@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 
 	"github.com/ggerganov/whisper.cpp/bindings/go/pkg/whisper"
 	"github.com/go-audio/wav"
@@ -78,7 +79,8 @@ func (l *WhisperClient) Transcribe(ctx context.Context, audioPath string) (io.Re
 			case <-ctx.Done():
 				return
 			default:
-				if _, err = w.Write([]byte(token.Text)); err != nil {
+				chunk := normalizeWhisperToken(token)
+				if _, err = w.Write([]byte(chunk)); err != nil {
 					_ = w.CloseWithError(err)
 					return
 				}
@@ -94,4 +96,11 @@ func (l *WhisperClient) Transcribe(ctx context.Context, audioPath string) (io.Re
 	}()
 
 	return r, nil
+}
+
+var whisperTagRE = regexp.MustCompile(`\[_BEG_]|\[_EOT_]|\[_TT_\d+]`)
+
+func normalizeWhisperToken(t whisper.Token) string {
+	s := whisperTagRE.ReplaceAllString(t.Text, "")
+	return s
 }

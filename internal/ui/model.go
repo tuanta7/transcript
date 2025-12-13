@@ -10,6 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/tuanta7/ekko/internal/core"
+	"github.com/tuanta7/ekko/pkg/logger"
 )
 
 type screen int
@@ -30,16 +31,19 @@ type Model struct {
 	spinner           spinner.Model
 	transcript        viewport.Model
 	transcriptContent string
+	chunkCount        int
+	sessionStart      time.Time
 
 	app    *core.Application
 	stream <-chan string
+	logger *logger.FileLogger
 }
 
 func NewModel(app *core.Application) *Model {
 	sp := spinner.New()
 	sp.Spinner = spinner.Dot
 
-	vp := viewport.New(90, 5)
+	vp := viewport.New(100, 10)
 	vp.SetContent("")
 
 	return &Model{
@@ -64,6 +68,8 @@ func (m *Model) handleMenuSelection() (tea.Model, tea.Cmd) {
 		m.transcript.SetContent("")
 		m.transcript.YOffset = 0
 		m.errorMsg = ""
+		m.chunkCount = 0
+		m.sessionStart = time.Now()
 
 		var err error
 		m.stream, err = m.app.Start(m.chunkDuration)
@@ -141,6 +147,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.spinner, cmd = m.spinner.Update(mt)
 		return m, cmd
 	case transcriptChunkMsg:
+		m.chunkCount++
 		m.transcriptContent += mt.Text + "\n"
 		wrapped := wordwrap.String(m.transcriptContent, m.transcript.Width-3)
 		m.transcript.SetContent(wrapped)
@@ -163,39 +170,68 @@ func (m *Model) View() string {
 
 	switch m.screen {
 	case screenMenu:
-		b.WriteString(titleStyle.Render("Audio Transcription"))
+		b.WriteString(subtitleStyle.Render(" Real-time Audio Transcription"))
 		b.WriteString("\n")
 
+		// Menu items
+		var menuItems strings.Builder
 		for i, choice := range m.menuOptions {
-			cursor := " "
+			icon := " "
 			label := choice
-			if choice == "Chunk Duration" {
-				label = fmt.Sprintf("Chunk Duration: %ds", int(m.chunkDuration.Seconds()))
+
+			switch choice {
+			case "Start Session":
+				icon = "▶"
+			case "Chunk Duration":
+				icon = "⏱"
+				durVal := durationValueStyle.Render(fmt.Sprintf("%ds", int(m.chunkDuration.Seconds())))
+				label = fmt.Sprintf("Chunk Duration: %s  ◀ ▶", durVal)
+			case "Exit":
+				icon = "✕"
 			}
+
 			if m.cursor == i {
-				cursor = ">"
-				label = selectedStyle.Render(label)
+				cursor := cursorStyle.Render("●")
+				menuItems.WriteString(fmt.Sprintf(" %s %s %s\n", cursor, icon, selectedStyle.Render(label)))
 			} else {
-				label = normalStyle.Render(label)
+				menuItems.WriteString(fmt.Sprintf("   %s %s\n", icon, normalStyle.Render(label)))
 			}
-			b.WriteString(fmt.Sprintf("%s %s\n", cursor, label))
 		}
+		b.WriteString(menuBoxStyle.Render(menuItems.String()))
 
 		if m.errorMsg != "" {
 			b.WriteString("\n")
-			b.WriteString(errorStyle.Render(m.errorMsg))
+			b.WriteString(errorStyle.Render(" ⚠ " + m.errorMsg + " "))
 			b.WriteString("\n")
 		}
 
-		b.WriteString(helpStyle.Render("up/down: navigate • left/right: adjust duration • enter: select • q: quit"))
-	case screenRecording:
-		b.WriteString(titleStyle.Render("Recording Session"))
 		b.WriteString("\n")
-		b.WriteString(statusStyle.Render(m.spinner.View() + " Recording..."))
+		help := fmt.Sprintf("%s navigate  %s adjust  %s select  %s quit",
+			helpKeyStyle.Render("↑↓"),
+			helpKeyStyle.Render("←→"),
+			helpKeyStyle.Render("enter"),
+			helpKeyStyle.Render("q"))
+		b.WriteString(helpStyle.Render(help))
+
+	case screenRecording:
+		elapsed := time.Since(m.sessionStart).Round(time.Second)
+		recDot := recordingDotStyle.Render("●")
+		status := fmt.Sprintf("%s %s  Recording  •  %s elapsed  •  %d chunks",
+			m.spinner.View(),
+			recDot,
+			elapsed.String(),
+			m.chunkCount)
+		b.WriteString(statusStyle.Render(status))
 		b.WriteString("\n")
 		b.WriteString(transcriptBoxStyle.Render(transcriptTextStyle.Render(m.transcript.View())))
-		b.WriteString("\n")
-		b.WriteString(helpStyle.Render("↑/↓: scroll • s: stop and save • q: quit"))
+		b.WriteString("\n\n")
+
+		// Help
+		help := fmt.Sprintf("%s scroll  %s stop & save  %s quit",
+			helpKeyStyle.Render("↑↓"),
+			helpKeyStyle.Render("s"),
+			helpKeyStyle.Render("q"))
+		b.WriteString(helpStyle.Render(help))
 	}
 
 	return b.String()

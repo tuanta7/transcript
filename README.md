@@ -18,6 +18,9 @@ Run the script below to install required dependencies
 
 ```bash
 # Install required dependencies
+make install
+
+# or
 ./install.sh
 ```
 

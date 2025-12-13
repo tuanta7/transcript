@@ -49,18 +49,18 @@ func (a *Application) Start(chunkDuration time.Duration) (<-chan string, error) 
 		return nil, errors.New("session already running")
 	}
 
-	if err := os.Mkdir(".tmp", 0755); err != nil {
+	if err := a.initSession(); err != nil {
 		return nil, err
 	}
 
-	if err := a.initSession(); err != nil {
+	if err := os.Mkdir(".tmp", 0755); err != nil {
 		return nil, err
 	}
 
 	a.isRunning = true
 	a.mu.Unlock()
 
-	stream := make(chan string, 100)
+	stream := make(chan string, 10)
 	a.wg = sync.WaitGroup{}
 	a.wg.Add(2)
 
@@ -129,16 +129,21 @@ func (a *Application) Stop() (string, error) {
 	if a.cancel != nil {
 		a.cancel()
 	}
+
+	if err := os.RemoveAll(".tmp"); err != nil {
+		return "", err
+	}
+
 	a.mu.Unlock()
 
 	ch := make(chan struct{})
 	go func() {
-		a.wg.Wait()
+		a.wg.Wait() // workers finished
 		close(ch)
 	}()
 
 	select {
-	case <-ch: // workers finished
+	case <-ch: // channel closed
 	case <-time.After(5 * time.Second):
 	}
 
@@ -161,6 +166,5 @@ func (a *Application) save() (string, error) {
 		return "", fmt.Errorf("failed to write file: %w", err)
 	}
 
-	_ = os.RemoveAll(".tmp")
 	return filename, nil
 }
