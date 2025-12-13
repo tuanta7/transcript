@@ -5,6 +5,9 @@ SHELL := /bin/bash
 install:
 	./scripts/install.sh
 
+build:
+	./scripts/build-whisper.sh
+
 dev:
 	source ./scripts/setup-whisper.sh
 	go run .

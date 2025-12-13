@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sudo apt install pulseaudio-utils
-sudo apt install ffmpeg
+sudo apt update
+sudo apt install pulseaudio-utils ffmpeg build-essential cmake
